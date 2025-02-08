@@ -69,7 +69,6 @@ app.use(express.json());
 // });
 
 app.use(express.static("public"));
-app.use("/img", express.static(path.join(__dirname, "public/img")));
 
 // Routes
 app.use("/api/product", require("./routes/product"));
