@@ -3,56 +3,56 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const helmet = require("helmet");
+const session = require("express-session");
 const { redisClient, redisStore } = require("./redis");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// start of defining middlewares
-// app.use(
-//   helmet({
-//     contentSecurityPolicy: {
-//       directives: {
-//         defaultSrc: ["'self'"],
-//         scriptSrc: ["'self'", "*.fontawesome.com"],
-//         styleSrc: ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
-//         fontSrc: ["'self'", "https://fonts.gstatic.com", "https://ka-f.fontawesome.com"], // Allow FontAwesome fonts
-//         connectSrc: ["'self'", "https://ka-f.fontawesome.com"],
-//       },
-//     },
-//   })
-// );
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "*.fontawesome.com"],
+        styleSrc: ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com", "https://ka-f.fontawesome.com"], // Allow FontAwesome fonts
+        connectSrc: ["'self'", "https://ka-f.fontawesome.com"],
+      },
+    },
+  })
+);
 
-// app.use(
-//   session({
-//     store: redisStore,
-//     secret: process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: { secure: process.env.NODE_ENV === "production", httpOnly: true, maxAge: null },
-//   })
-// );
+app.use(
+  session({
+    store: redisStore,
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === "production", httpOnly: true, maxAge: null },
+  })
+);
 
-// app.use((req, res, next) => {
-//   if (!req.session) {
-//     return res.status(500).json({ error: "Session is not initialized properly" });
-//   }
+app.use((req, res, next) => {
+  if (!req.session) {
+    return res.status(500).json({ error: "Session is not initialized properly" });
+  }
 
-//   if (!req.session.userId) {
-//     req.session.userId = `user-${Date.now()}`;
-//     req.session.cart = [];
-//     console.log("✅ New session created:", req.session.userId);
-//   }
+  if (!req.session.userId) {
+    req.session.userId = `user-${Date.now()}`;
+    req.session.cart = [];
+    console.log("✅ New session created:", req.session.userId);
+  }
 
-//   next();
-// });
+  next();
+});
 
-// app.use("/api", (req, res, next) => {
-//   setTimeout(() => {
-//     next();
-//   }, 1);
-// });
+app.use("/api", (req, res, next) => {
+  setTimeout(() => {
+    next();
+  }, 2000);
+});
 
 // app.use((req, res, next) => {
 //   try {
